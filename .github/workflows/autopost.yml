@@ -30,18 +30,7 @@ jobs:
           cache: pip
 
       - run: pip install -r requirements.txt
-      
-      - name: Check key length
-        env:
-          CUSTOM_API_KEY: ${{ secrets.CUSTOM_API_KEY }}
-        run: |
-          echo "key length: ${#CUSTOM_API_KEY}"
-          curl -sf https://api.orcarouter.ai/v1/chat/completions \
-            -H "Authorization: Bearer $CUSTOM_API_KEY" \
-            -H "Content-Type: application/json" \
-            -d '{"model":"deepseek/deepseek-v4-flash-free","messages":[{"role":"user","content":"ping"}]}' \
-            > /dev/null && echo "key OK"
-        
+              
       - name: Run autopost
         env:
           AI_PROVIDER: custom
