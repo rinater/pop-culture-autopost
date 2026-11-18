@@ -2,7 +2,7 @@ name: autopost
 
 on:
   schedule:
-    - cron: "*/20 * * * *"   # GitHub может задерживать запуск на несколько минут
+    - cron: "*/20 * * * *"
   workflow_dispatch:
     inputs:
       dry_run:
@@ -11,7 +11,7 @@ on:
         default: false
 
 permissions:
-  contents: write            # нужно, чтобы коммитить data/state.db
+  contents: write
 
 concurrency:
   group: autopost
@@ -30,24 +30,13 @@ jobs:
           cache: pip
 
       - run: pip install -r requirements.txt
-      
-    - name: Check OrcaRouter key
-        env:
-          CUSTOM_API_KEY: ${{ secrets.CUSTOM_API_KEY }}
-        run: |
-          echo "key length: ${#CUSTOM_API_KEY}"
-          curl -sf https://api.orcarouter.ai/v1/chat/completions \
-            -H "Authorization: Bearer $CUSTOM_API_KEY" \
-            -H "Content-Type: application/json" \
-            -d '{"model":"deepseek/deepseek-v4-flash-free","messages":[{"role":"user","content":"ping"}]}' \
-            > /dev/null && echo "key OK"
-            
+
       - name: Run autopost
         env:
           AI_PROVIDER: custom
           CUSTOM_BASE_URL: https://api.orcarouter.ai/v1
-          CUSTOM_API_KEY: ${{ secrets.CUSTOM_API_KEY }}
           CUSTOM_MODEL: deepseek/deepseek-v4-flash-free
+          CUSTOM_API_KEY: ${{ secrets.CUSTOM_API_KEY }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           DB_PATH: data/state.db
@@ -63,4 +52,3 @@ jobs:
           git diff --cached --quiet || git commit -m "chore: update state [skip ci]"
           git pull --rebase --autostash || true
           git push || true
-# registered
