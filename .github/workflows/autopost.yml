@@ -1,0 +1,52 @@
+name: autopost
+
+on:
+  schedule:
+    - cron: "*/20 * * * *"   # GitHub может задерживать запуск на несколько минут
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Dry run (без отправки в Telegram)"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write            # нужно, чтобы коммитить data/state.db
+
+concurrency:
+  group: autopost
+  cancel-in-progress: false
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - run: pip install -r requirements.txt
+
+      - name: Run autopost
+        env:
+          AI_PROVIDER: openrouter
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          DB_PATH: data/state.db
+          DRY_RUN: ${{ inputs.dry_run || 'false' }}
+        run: python -m autopost
+
+      - name: Persist state
+        if: always()
+        run: |
+          git config user.name "autopost-bot"
+          git config user.email "autopost-bot@users.noreply.github.com"
+          if [ -f data/state.db ]; then git add -f data/state.db; fi
+          git diff --cached --quiet || git commit -m "chore: update state [skip ci]"
+          git pull --rebase --autostash || true
+          git push || true
