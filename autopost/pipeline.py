@@ -131,15 +131,21 @@ def run(s: Settings) -> None:
 
             llm_attempts += 1
             store.bump_llm_calls()
-            try:
-                body = _edit(llm, c, recent_titles, s.virality_threshold)
-            except LLMUnavailable:
-                log.warning("LLM недоступна, запуск останавливается; новости остаются в очереди")
-                break
-            except Exception:
-                log.exception("ошибка обработки %s", c.item.url)
-                store.set_status([c.item.url], "error")
-                continue
+          
+            if s.use_llm:
+                llm_attempts += 1
+                store.bump_llm_calls()
+                try:
+                    body = _edit(llm, c, recent_titles, s.virality_threshold)
+                except LLMUnavailable:
+                    log.warning("LLM недоступна, запуск останавливается; новости остаются в очереди")
+                    break
+                except Exception:
+                    log.exception("ошибка обработки %s", c.item.url)
+                    store.set_status([c.item.url], "error")
+                    continue
+            else:
+                body = _raw_post(c.item)
 
             group_urls = [o.url for o in c.group]
             handled.update(group_urls)
