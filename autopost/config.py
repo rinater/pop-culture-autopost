@@ -23,8 +23,8 @@ BSKY_FEEDS: list[tuple[str, str]] = [
 
 # Приоритет источников для сортировки кандидатов (тай-брейк).
 SOURCE_PRIORITY = {
-    "Variety": 5, "Deadline": 5, "THR": 4, "Dexerto": 4,
-    "IGN": 3, "Polygon": 3, "Pitchfork": 2,
+    "Variety": 5, "Deadline": 5, "THR": 4, "Dexerto": 5,
+    "IGN": 3, "Polygon": 3, "Pitchfork": 3,
 }
 
 
