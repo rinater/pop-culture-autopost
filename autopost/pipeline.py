@@ -55,6 +55,8 @@ def _edit(llm: LLMClient, c: Candidate, recent_titles: list[str], threshold: int
         return None
     return sanitize_html(body)
 
+def _raw_post(it: Item) -> str:
+    return f"<b>{sanitize_html(it.title)}</b>"
 
 def run(s: Settings) -> None:
     store = Storage(s.db_path)
