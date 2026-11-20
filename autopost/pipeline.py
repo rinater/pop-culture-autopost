@@ -114,7 +114,7 @@ def run(s: Settings) -> None:
         )
 
         # 6. Редактура, картинка, отправка
-        llm = LLMClient(s)
+        llm = LLMClient(s) if s.use_llm else None
         tg = Telegram(s.tg_token, s.tg_chat_id, s.dry_run)
         handled: set[str] = set()
         recent_titles = posted[:20]
