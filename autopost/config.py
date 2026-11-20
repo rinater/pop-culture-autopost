@@ -4,6 +4,8 @@ from dataclasses import dataclass
 from dotenv import load_dotenv
 
 load_dotenv()
+use_llm: bool
+use_llm=_flag("USE_LLM"),
 
 RSS_FEEDS: list[tuple[str, str]] = [
     ("Dexerto", "https://www.dexerto.com/feed/"),
