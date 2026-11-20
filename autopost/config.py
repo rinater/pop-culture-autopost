@@ -62,7 +62,7 @@ def load_settings() -> Settings:
     s = Settings(
         ai_provider=os.getenv("AI_PROVIDER", "openrouter").strip().lower(),
         openrouter_key=os.getenv("OPENROUTER_API_KEY", ""),
-        openrouter_model=os.getenv("OPENROUTER_MODEL", "deepseek/deepseek-chat:free"),
+        openrouter_model=os.getenv("OPENROUTER_MODEL", "google/gemma-4-26b-a4b-it:free"),
         groq_key=os.getenv("GROQ_API_KEY", ""),
         groq_model=os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile"),
         ollama_url=os.getenv("OLLAMA_URL", "http://localhost:11434/v1"),
