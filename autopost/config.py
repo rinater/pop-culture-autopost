@@ -4,8 +4,7 @@ from dataclasses import dataclass
 from dotenv import load_dotenv
 
 load_dotenv()
-use_llm: bool
-use_llm=_flag("USE_LLM"),
+
 
 RSS_FEEDS: list[tuple[str, str]] = [
     ("Dexerto", "https://www.dexerto.com/feed/"),
@@ -50,6 +49,7 @@ class Settings:
     item_max_age_hours: int
     db_path: str
     dry_run: bool
+    use_llm: bool
 
 
 def _flag(name: str) -> bool:
@@ -79,6 +79,7 @@ def load_settings() -> Settings:
         max_llm_calls_per_run=_int("MAX_LLM_CALLS_PER_RUN", 10),
         max_llm_calls_per_day=_int("MAX_LLM_CALLS_PER_DAY", 200),
         item_max_age_hours=_int("ITEM_MAX_AGE_HOURS", 24),
+        use_llm=_flag("USE_LLM"),
         db_path=os.getenv("DB_PATH", "data/state.db"),
         dry_run=_flag("DRY_RUN"),
     )
