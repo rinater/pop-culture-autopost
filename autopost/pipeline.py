@@ -33,6 +33,14 @@ def _is_bsky(it: Item) -> bool:
     return it.source.startswith("Bluesky/")
 
 
+def _raw_post(it: Item) -> str:
+    """Режим без LLM: заголовок и краткое описание на языке источника."""
+    text = f"<b>{sanitize_html(it.title)}</b>"
+    if it.summary:
+        text += f"\n\n{sanitize_html(it.summary[:300])}"
+    return text
+
+
 def _edit(llm: LLMClient, c: Candidate, recent_titles: list[str], threshold: int) -> str | None:
     sources = sorted({base_source(o.source) for o in c.group})
     parts = ["Последние заголовки канала (не повторять эти темы):"]
@@ -50,13 +58,14 @@ def _edit(llm: LLMClient, c: Candidate, recent_titles: list[str], threshold: int
         score = min(10, score + 1)
     body = SCORE_RE.sub("", raw, count=1).strip()
 
-    if not body or body.upper().startswith("SKIP") or score < threshold:
-        log.info("пропуск (score=%d): %s", score, c.item.title[:80])
+    if not body or body.upper().startswith("SKIP"):
+        log.info("SKIP моделью (score=%d): %s", score, c.item.title[:80])
+        return None
+    if score < threshold:
+        log.info("ниже порога (score=%d < %d): %s", score, threshold, c.item.title[:80])
         return None
     return sanitize_html(body)
 
-def _raw_post(it: Item) -> str:
-    return f"<b>{sanitize_html(it.title)}</b>"
 
 def run(s: Settings) -> None:
     store = Storage(s.db_path)
@@ -113,7 +122,7 @@ def run(s: Settings) -> None:
             reverse=True,
         )
 
-        # 6. Редактура, картинка, отправка
+        # 6. Редактура (если включена), картинка, отправка
         llm = LLMClient(s) if s.use_llm else None
         tg = Telegram(s.tg_token, s.tg_chat_id, s.dry_run)
         handled: set[str] = set()
@@ -124,17 +133,14 @@ def run(s: Settings) -> None:
                 break
             if c.item.url in handled:
                 continue
-            if llm_attempts >= s.max_llm_calls_per_run:
-                log.info("лимит LLM на запуск исчерпан")
-                break
-            if store.llm_calls_today() >= s.max_llm_calls_per_day:
-                log.warning("дневной лимит LLM исчерпан")
-                break
 
-            llm_attempts += 1
-            store.bump_llm_calls()
-          
             if s.use_llm:
+                if llm_attempts >= s.max_llm_calls_per_run:
+                    log.info("лимит LLM на запуск исчерпан")
+                    break
+                if store.llm_calls_today() >= s.max_llm_calls_per_day:
+                    log.warning("дневной лимит LLM исчерпан")
+                    break
                 llm_attempts += 1
                 store.bump_llm_calls()
                 try:
