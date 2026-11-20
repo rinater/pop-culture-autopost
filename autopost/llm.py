@@ -78,8 +78,9 @@ class LLMClient:
                     log.warning("%s вернула пустой ответ", model)
                     break
                 except RateLimitError:
-                    log.warning("%s: 429, перехожу к следующей модели", model)
-                    break
+                    log.warning("%s: 429, пауза 5 с", model)
+                    time.sleep(5)
+                    continue
                 except APIError as e:
                     status = getattr(e, "status_code", None)
                     if status and 400 <= status < 500:
