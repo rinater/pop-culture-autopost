@@ -33,9 +33,9 @@ jobs:
               
       - name: Run autopost
         env:
-          AI_PROVIDER: custom
-          CUSTOM_BASE_URL: https://api.orcarouter.ai/v1
-          CUSTOM_MODEL: deepseek/deepseek-v4-flash-free
+          AI_PROVIDER: openrouter
+          CUSTOM_BASE_URL: https://openrouter.ai/api/v1
+          CUSTOM_MODEL: google/gemma-4-26b-a4b-it:free
           CUSTOM_API_KEY: ${{ secrets.CUSTOM_API_KEY }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
