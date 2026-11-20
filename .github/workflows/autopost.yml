@@ -42,6 +42,7 @@ jobs:
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           DB_PATH: data/state.db
           DRY_RUN: ${{ inputs.dry_run || 'false' }}
+          SE_LLM: "0"
         run: python -m autopost
 
       - name: Persist state
