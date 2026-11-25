@@ -14,6 +14,8 @@ RSS_FEEDS: list[tuple[str, str]] = [
     ("IGN", "https://feeds.feedburner.com/ign/all"),
     ("Polygon", "https://www.polygon.com/rss/index.xml"),
     ("Pitchfork", "https://pitchfork.com/feed/feed-news/rss"),
+    ("Collider", "https://collider.com/feed/"),
+    ("DTF", "https://dtf.ru/rss/all"),
 ]
 
 # Неофициальные RSS-ленты Bluesky: если не отвечают, пропускаются без падения.
